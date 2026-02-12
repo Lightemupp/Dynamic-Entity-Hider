@@ -14,7 +14,7 @@ repositories {
 }
 
 def runeLiteVersion = 'latest.release'
-def pluginMainClass = 'com.example.ExamplePluginTest'
+def pluginMainClass = 'com.DynamicEntityHider'
 
 dependencies {
 	compileOnly group: 'net.runelite', name:'client', version: runeLiteVersion
@@ -27,7 +27,7 @@ dependencies {
 	testImplementation group: 'net.runelite', name:'jshell', version: runeLiteVersion
 }
 
-group = 'com.example'
+group = 'com.DynamicEntityHider'
 version = '1.0-SNAPSHOT'
 
 tasks.withType(JavaCompile).configureEach {
@@ -35,12 +35,21 @@ tasks.withType(JavaCompile).configureEach {
 	options.release.set(11)
 }
 
-tasks.register('run', JavaExec) {
+tasks.register("run", JavaExec) {
+	group = "runelite"
 	classpath = sourceSets.test.runtimeClasspath
-	mainClass = pluginMainClass
 
-	jvmArgs "-ea"
-	args "--developer-mode", "--debug"
+	// CHANGE THIS: It must point to the Test class, NOT the Plugin class
+	mainClass = 'com.DynamicEntityHider.DynamicEntityHiderTest'
+
+	jvmArgs += [
+			"-ea",
+			"--add-exports=java.desktop/sun.awt=ALL-UNNAMED",
+			"--add-opens=java.desktop/sun.awt=ALL-UNNAMED",
+			"--add-opens=java.base/java.lang=ALL-UNNAMED",
+			"--add-opens=java.base/java.util=ALL-UNNAMED",
+			"-Ddeveloper-mode=true"
+	]
 }
 
 tasks.register('shadowJar', Jar) {
